@@ -3,8 +3,6 @@ require("dotenv").config();
 const { API_URL } = process.env;
 const { Pokemon, Type } = require("../db");
 
-
-
 const allPokemons = async (req, res, next) => {
   const api = await axios.get(API_URL);
   const pokemonsDb = await Pokemon.findAll({ include: Type });
@@ -43,9 +41,6 @@ const allPokemons = async (req, res, next) => {
   return pokemons;
 };
 
-
-
-
 const getPokemons = async (req, res, next) => {
   const { name } = req.query;
 
@@ -62,9 +57,6 @@ const getPokemons = async (req, res, next) => {
     );
   }
 };
-
-
-
 
 const getById = async (req, res, next) => {
   const { id } = req.params;
@@ -94,4 +86,53 @@ const getById = async (req, res, next) => {
 // requerir id , llamar a la funcion p/ que traiga todos
 //
 
-module.exports = { allPokemons , getPokemons, getById };
+const postPokemons = async (req, res, next) => {
+  const { name, hp, attack, defense, speed, height, weight, image, type } =
+    req.body;
+
+  try {
+    const pokemons = await allPokemons();
+    
+    if (name){ // si ingrese name por body
+      let pokeExist = pokemons.find(el => el.name == name)
+      
+      if (!pokeExist){
+        
+        const pokemon = await Pokemon.create({
+          //en .create no uso where
+          name,
+          hp,
+          attack,
+          defense,
+          speed,
+          height,
+          weight,
+          image,
+          createdInDb: true,
+        });
+        
+        const typeDb = await Type.findAll({
+          where: {
+            name:type
+          }
+        })
+        
+        await pokemon.setTypes(typeDb);
+        
+        res.status(201).send(pokemon); // MEJORAR LOGICA EN BASE DE DATOS
+        // FLOW DEL CODIGO
+      }
+
+      res.status(404).send("El pokemon ya encontraba ingresado")
+    
+    } else {
+      res.status(404).send("Debe ingresar un nombre, es obligatorio")
+    }
+      
+    
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = { allPokemons, getPokemons, getById, postPokemons };
