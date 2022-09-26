@@ -1,0 +1,23 @@
+.paginado{
+      margin-left: -35px ;
+}
+
+.lista {
+      display: inline-block;
+      text-decoration: none;
+      margin: 4px;
+      text-align: center;
+}
+
+.nros {
+      text-decoration: none;
+      background-color: rgba(0, 0, 0, 0.447);
+      ;
+      color: rgb(239, 239, 239);
+      border: 1px solid rgba(19, 158, 165, 0.071);
+      width: 10px;
+}
+
+.nros:hover {
+      background-color: rgb(0, 0, 0);
+}

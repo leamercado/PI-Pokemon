@@ -4,100 +4,140 @@ const { API_URL } = process.env;
 const { Pokemon, Type } = require("../db");
 
 const allPokemons = async (req, res, next) => {
-  const api = await axios.get(API_URL);
-  const pokemonsDb = await Pokemon.findAll({ include: Type });
+  // traigo todos ,desde api y db con tabla relac
+  const pokemonsDb = await Pokemon.findAll({
+    include: {
+      model: Type,
+      attributes: ["name"],
+      through: {
+        attributes: [],
+      },
+    },
+  });
 
-  //   me devuelve los 1eros 20, pero quiero traer 40, por lo que voy a guardarlos en un array, y después hago un .next, para completar los 40.
-  // de cada uno de los pokemons, tengo que hacer otra req para traerme los datos de c/u
+  try {
+    let url = "https://pokeapi.co/api/v2/pokemon/";
+    let array = [];
+    do {
+      let api = await axios.get(url);
+      let pokemonesApi = api.data;
+      let auxPokes = api.data.results.map((el) => {
+        return {
+          name: el.name,
+          url: el.url,
+        };
+      });
 
-  let array = [];
-  const api1 = api.data.results.map((el) => el.url);
-  const api2 = await axios(api.data.next);
-  array.push(api1.concat(api2.data.results.map((el) => el.url)));
+      array.push(...auxPokes);
+      url = pokemonesApi.next;
+    } while (array.length < 20 && url != null);
 
-  const pokemonsApi = await Promise.all(
-    array.flat().map(async (el) => {
-      const pokemon = await axios(el);
-      return {
-        id: pokemon.data.id,
-        name: pokemon.data.name,
-        hp: pokemon.data.stats[0].base_stat,
-        attack: pokemon.data.stats[1].base_stat,
-        defense: pokemon.data.stats[2].base_stat,
-        speed: pokemon.data.stats[5].base_stat,
-        height: pokemon.data.height,
-        weight: pokemon.data.weight,
-        image: pokemon.data.sprites.other.home.front_default,
-        types: pokemon.data.types.map((el) => el.type.name),
-      };
-    })
-  );
+    const pokemonsApi = await Promise.all(
+      array.flat().map(async (el) => {
+        const pokemon = await axios(el);
+        return {
+          id: pokemon.data.id,
+          name: pokemon.data.name,
+          hp: pokemon.data.stats[0].base_stat,
+          attack: pokemon.data.stats[1].base_stat,
+          defense: pokemon.data.stats[2].base_stat,
+          speed: pokemon.data.stats[5].base_stat,
+          height: pokemon.data.height,
+          weight: pokemon.data.weight,
+          image: pokemon.data.sprites.other.home.front_default,
+          types: pokemon.data.types.map((el) => el.type.name),
+        };
+      })
+    );
 
-  // el Promise.all itera sobre un arreglo de promesas
-  // en una constante voy a guardar lo que me devuelve el (arreglo de promesas mapeado )
+    // el Promise.all itera sobre un arreglo de promesas
+    // en una constante voy a guardar lo que me devuelve el (arreglo de promesas mapeado )
 
-  const pokemons = [...pokemonsApi, ...pokemonsDb];
+    const pokemons = [...pokemonsApi, ...pokemonsDb];
 
-  return pokemons;
+    return pokemons;
+
+  } catch (err) {
+    console.log(err.message);
+  }
 };
+
 
 const getPokemons = async (req, res, next) => {
+  // GET. Si no se pasa nombre, envío todos, ya ordenados
   const { name } = req.query;
 
-  const pokemons = await allPokemons();
+  try {
+    const pokemons = await allPokemons();
 
-  if (!name) {
-    res.send(pokemons);
-  } else {
-    const pokemonByName = pokemons.filter(
-      (el) => el.name == name.toLowerCase()
-    );
-    res.json(
-      pokemonByName ? pokemonByName : "No se encontró el pokemon buscado"
-    );
+    if (!name) {
+      res.send(pokemons.sort((a, b) => (a.name > b.name ? 1 : -1)));
+    } else {
+      const pokemonByName = pokemons.filter(
+        (el) => el.name.toLowerCase() === name.toLowerCase()
+      );
+
+      pokemonByName.length // usar el .length
+        ? res.status(200).send(pokemonByName)
+        : res.status(200).json([]);
+    }
+  } catch (err) {
+    console.log(err);
   }
 };
 
-const getById = async (req, res, next) => {
+const getById = (req, res, next) => {
+  // si está en db find por la primaryKey
+  // sino hago solicitud a la api, con el id,  para que lo traiga, buscando solo los datos que necesito para el detalle
   const { id } = req.params;
 
-  let pokemonFound;
   if (id.length > 6) {
-    pokemonFound = await Pokemon.findByPk(id);
+    Pokemon.findByPk(id, {
+      include: [
+        {
+          model: Type,
+          attributes: ["name"],
+          through: {
+            attributes: [],
+          },
+        },
+      ],
+    })
+      .then((pokemon) => res.json(pokemon))
+      .catch((err) => console.log({ error: err.message }));
   } else {
-    let pokemon = await axios(API_URL + id);
-    let poke = await pokemon.data;
-    pokemonFound = {
-      id: poke.id,
-      name: poke.name,
-      hp: poke.stats[0].base_stat,
-      attack: poke.stats[1].base_stat,
-      defense: poke.stats[2].base_stat,
-      speed: poke.stats[5].base_stat,
-      height: poke.height,
-      weight: poke.weight,
-      image: poke.sprites.other.home.front_default,
-      types: poke.types.map((el) => el.type.name),
-    };
+    axios(API_URL + id)
+      .then((res) => res.data)
+      .then((poke) => {
+        return {
+          id: poke.id,
+          name: poke.name,
+          hp: poke.stats[0].base_stat,
+          attack: poke.stats[1].base_stat,
+          defense: poke.stats[2].base_stat,
+          speed: poke.stats[5].base_stat,
+          height: poke.height,
+          weight: poke.weight,
+          image: poke.sprites.other.home.front_default,
+          types: poke.types.map((el) => el.type.name),
+        };
+      })
+      .then((pokemon) => res.json(pokemon))
+      .catch((err) => console.log({ error: err.message }));
   }
-  res.json(pokemonFound);
 };
 
-// requerir id , llamar a la funcion p/ que traiga todos
-//
-
 const postPokemons = async (req, res, next) => {
-  const { name, hp, attack, defense, speed, height, weight, image, type } =
+  const { name, hp, attack, defense, speed, height, weight, image, types } =
     req.body;
 
   try {
     const pokemons = await allPokemons();
-    
-    if (name){ // si ingrese name por body
-      let pokeExist = pokemons.find(el => el.name == name)
-      
-      if (!pokeExist){
-        
+
+    if (name) {
+      // si ingrese name por body
+      let pokeExist = pokemons.find((el) => el.name == name);
+      if (!pokeExist) {
         const pokemon = await Pokemon.create({
           //en .create no uso where
           name,
@@ -108,31 +148,28 @@ const postPokemons = async (req, res, next) => {
           height,
           weight,
           image,
-          createdInDb: true,
         });
-        
         const typeDb = await Type.findAll({
           where: {
-            name:type
-          }
-        })
-        
+            name: types,
+          },
+        });
         await pokemon.setTypes(typeDb);
-        
-        res.status(201).send(pokemon); // MEJORAR LOGICA EN BASE DE DATOS
-        // FLOW DEL CODIGO
+        res.status(201).send(pokemon);
       }
-
-      res.status(404).send("El pokemon ya encontraba ingresado")
-    
+      // si pokeExiste ->
+      res.status(404).send("El pokemon ya encontraba ingresado");
     } else {
-      res.status(404).send("Debe ingresar un nombre, es obligatorio")
+      // si no ingresó el nombre
+      res.status(404).send("Debe ingresar un nombre, es obligatorio");
     }
-      
-    
   } catch (err) {
     next(err);
   }
 };
 
-module.exports = { allPokemons, getPokemons, getById, postPokemons };
+const getDetailTypes = (req,res,next) => {
+  res.send("hola estoy en pokemons / types")
+}
+
+module.exports = { allPokemons, getPokemons, getById, postPokemons , getDetailTypes};

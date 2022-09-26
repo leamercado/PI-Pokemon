@@ -1,17 +1,16 @@
 const {Pokemon, Type} = require("../db")
 const axios = require ("axios");
-const { allPokemons } = require("./pokemons");
 
 const getTypes = async (req,res,next) => {
       const typesPokemons = await axios("https://pokeapi.co/api/v2/type");
+      const types = typesPokemons.data.results.map(el => el.name)
+      
+      // console.log(types)
 
-      const types = typesPokemons.data.results.map(el => el.name).join().split(",")
-      // mapeo el arreglo de pokemones para extraer solo los types , hago un set para que no se repitan, y aplano el array
-
-      types.forEach( el => {
+      types.forEach( type => {
             Type.findOrCreate({
                   where: {
-                        name:el
+                        name:type
                   }
             })
       })
@@ -23,5 +22,3 @@ const getTypes = async (req,res,next) => {
 }
 
 module.exports = {getTypes}
-
-// me traigo pokes de la api, los mapeo, obteniendo solo los types, hago un set

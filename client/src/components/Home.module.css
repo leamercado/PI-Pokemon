@@ -1,0 +1,61 @@
+.body{
+      background-color: rgb(30, 19, 52);
+      margin-top: -22px;
+      margin-bottom: -22px;
+      color: antiquewhite;
+}
+
+.header{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      
+}
+
+.logo{
+      /* display: inline-block; */
+      margin-top: 30px;
+      max-width: 300px;
+      margin-bottom: 10px;
+}
+.btnHome{
+      /* display: grid; */
+      width: 200px;
+      background-color: rgb(30, 19, 52);
+      color: rgb(182, 217, 169);
+      border: 1px solid white;
+      cursor: pointer;
+      padding: 5px;
+      font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+.btnHome:hover {
+      background-color: rgba(0, 0, 255, 0.205);
+}
+
+.contNavBar{
+      display: flex;
+      flex-direction: column;
+      margin-top: 20px;
+      margin-bottom: 10px;
+}
+
+.bottom{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+}
+
+.btnCreate{
+      width: 120px;
+      background-color: rgb(30, 19, 52);
+      color: rgb(182, 217, 169);
+      border: 1px solid white;
+      cursor: pointer;
+      padding: 6px;
+      font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+.btnCreate:hover {
+      background-color: rgba(0, 0, 255, 0.205);
+}

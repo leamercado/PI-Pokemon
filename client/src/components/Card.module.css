@@ -1,0 +1,27 @@
+.cont {
+      background-color: rgb(30, 19, 52);
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.498);
+      padding: 30px;
+      margin: 10px;
+      border-radius: 60px;
+
+
+}
+
+.name{
+      color: antiquewhite;
+}
+
+.types{
+      color : darkorange;
+}
+
+.cont:hover {
+      background-color: black;
+}
+
+.linkCont{
+      text-decoration: none;
+      color: aliceblue;
+}

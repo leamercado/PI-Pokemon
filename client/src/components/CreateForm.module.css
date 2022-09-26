@@ -1,0 +1,45 @@
+
+.contenedor{
+      color: rgb(255, 255, 255);
+      width: 60vw;
+      height: 100vh;
+      margin: 10px auto;
+      padding: 15px;
+      border-radius: 5px;
+      background-color: rgba(0, 0, 0, 0.76);
+      box-shadow: rgba(155, 155, 155, 0.2) 0px 2px 8px 0px;
+}
+
+.btnSubmit:disabled{
+      background-color: burlywood;
+      color:rgb(69, 69, 69)
+}
+
+.btnSubmit{
+      background-color: rgb(7, 214, 0);
+      margin-top: 10px;
+      padding: 5px;
+      /* cursor: pointer; */
+      color:rgb(0, 0, 0)
+}
+
+
+.types{
+      /* display: block; */
+      margin-left:150px
+}
+
+.btnVolver {
+      margin: 0 auto;
+      padding: 5px;
+      font-size: medium;      
+      background-color: darkgrey;
+      
+}
+.btnVolver:hover {
+      font-size: medium;
+      cursor: pointer;
+      background-color: rgb(74, 17, 74);
+      color: aliceblue;
+      
+}

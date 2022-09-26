@@ -12,9 +12,9 @@ module.exports = (sequelize) => {
     },
     name: {
       type: DataTypes.STRING,
-      // allowNull: false,
+      allowNull: false,
     },
-    hp: {   // vida
+    hp: {   
       type: DataTypes.STRING,
     },
     attack: {
@@ -39,7 +39,7 @@ module.exports = (sequelize) => {
     createdInDb: {
       type:DataTypes.BOOLEAN,
       // allowNull:false,
-      defaultValue: false,
+      defaultValue: true,
     }
   }, 
   {timestamps: false});

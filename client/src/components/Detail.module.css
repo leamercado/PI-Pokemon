@@ -1,0 +1,47 @@
+.cont {
+  background-color: rgb(30, 19, 52);
+  color: white;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.498);
+  padding: 30px;
+  width: 60%;
+  height: 100%;
+  margin: 10px auto;
+  border-radius: 10px;
+}
+
+.detail {
+  display: grid;
+  grid-template-columns: auto auto;
+/* grid-template-rows: 22% auto ; */
+
+  gap: 5px;
+}
+
+.imagePoke {
+  width: 250px;
+}
+
+.estadisticas {
+  background-color: rgba(250, 235, 215, 0.053);
+  border-radius: 15px;
+}
+
+.btnVolver {
+  background-color: rgb(37, 0, 73);
+  color: rgb(255, 255, 255);
+  border-color: aliceblue;
+  border-radius: 5px;
+  font-size: medium;
+  padding: 5px;
+  cursor: pointer;
+}
+
+.btnVolver:hover {
+  background-color: rgba(0, 0, 0, 0.687);
+  color: rgb(196, 196, 196);
+}
+
+.loading {
+  background-color: rgb(30, 19, 52);
+}
